@@ -53,33 +53,59 @@ class NoteController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $uuid)
+    public function show(Note $note)
     {
-        $note = Note::where('uuid', $uuid)->where('user_id', Auth::id())->firstOrFail();
+        if($note->user_id != Auth::id()) {
+            return abort(403);
+        }
+        
+        // $note = Note::where('uuid', $uuid)->where('user_id', Auth::id())->firstOrFail();
         return view('notes.show')->with('note', $note);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Note $note)
     {
-        //
+        if($note->user_id != Auth::id()) {
+            return abort(403);
+        }
+        return view('notes.edit')->with('note', $note);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Note $note)
     {
-        //
+        if($note->user_id != Auth::id()) {
+            return abort(403);
+        }
+        
+        $request->validate([
+            'title' => 'required|max:120',
+            'text' => 'required'
+        ]);
+
+        $note->update ([
+            'title' => $request->title,
+            'text' => $request->text
+        ]);
+        return to_route('notes.show', $note)->with('seccess', 'Note updated seccessfully');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Note $note)
     {
-        //
+        if($note->user_id != Auth::id()) {
+            return abort(403);
+        }
+    
+        $note->delete();
+
+        return to_route('notes.index')->with('seccess', 'Note deleted seccessfully');
     }
 }
