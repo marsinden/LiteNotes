@@ -15,7 +15,9 @@ class NoteController extends Controller
      */
     public function index()
     {
-        $notes = Note::where('user_id', Auth::id())->latest('updated_at')->paginate(5);
+        //$notes = Note::where('user_id', Auth::id())->latest('updated_at')->paginate(5);
+        //$notes = Auth::user()->notes()->latest('updated_at')->paginate(5);
+        $notes = Note::whereBelongsTo(Auth::user())->latest('updated_at')->paginate(5);
         return view('notes.index')->with('notes', $notes);
 
         // $notes->each(function($note){
@@ -41,9 +43,8 @@ class NoteController extends Controller
             'text' => 'required'
         ]);
 
-        Note::create([
+        Auth::user()->notes()->create([
             'uuid' => Str::uuid(),
-            'user_id' => Auth::id(),
             'title' => $request->title,
             'text' => $request->text
         ]);
@@ -55,7 +56,7 @@ class NoteController extends Controller
      */
     public function show(Note $note)
     {
-        if($note->user_id != Auth::id()) {
+        if(!$note->user->is(Auth::user())) {
             return abort(403);
         }
         
@@ -68,7 +69,7 @@ class NoteController extends Controller
      */
     public function edit(Note $note)
     {
-        if($note->user_id != Auth::id()) {
+        if(!$note->user->is(Auth::user())) {
             return abort(403);
         }
         return view('notes.edit')->with('note', $note);
@@ -79,7 +80,7 @@ class NoteController extends Controller
      */
     public function update(Request $request, Note $note)
     {
-        if($note->user_id != Auth::id()) {
+        if(!$note->user->is(Auth::user())) {
             return abort(403);
         }
         
@@ -100,12 +101,12 @@ class NoteController extends Controller
      */
     public function destroy(Note $note)
     {
-        if($note->user_id != Auth::id()) {
+        if(!$note->user->is(Auth::user())) {
             return abort(403);
         }
     
         $note->delete();
 
-        return to_route('notes.index')->with('seccess', 'Note deleted seccessfully');
+        return to_route('notes.index')->with('seccess', 'Note moved to trashj');
     }
 }
