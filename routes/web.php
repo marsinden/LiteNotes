@@ -3,6 +3,7 @@
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TrashedNoteController;
+use App\Http\Middleware\LogMiddleware;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,13 +17,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+// this is the same:
+Route::view('/', 'welcome');
+
+
+Route::redirect('/homen', '/', 301);  //just for a test
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified',])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -31,6 +38,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::resource('/notes', NoteController::class)->middleware(['auth']);
+
 
 // Route::get('/trashed', [TrashedNoteController::class, 'index'])
 //     ->middleware('auth')->name('trashed.index');

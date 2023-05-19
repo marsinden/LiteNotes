@@ -33,7 +33,7 @@
                 </div>
             @endif
             <h1 class="text-5xl">
-                LiteNotes
+                Dashboard2
             </h1>
             <!-- just testing -->
             <?php
